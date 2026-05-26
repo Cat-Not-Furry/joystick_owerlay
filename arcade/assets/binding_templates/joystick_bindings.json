@@ -1,0 +1,40 @@
+{
+    "formato_4": {
+        "LP": null,
+        "LK": null,
+        "HP": null,
+        "HK": null,
+        "SELECT": null,
+        "START": null
+    },
+    "formato_4a": {
+        "LP": null,
+        "LK": null,
+        "HP": null,
+        "HK": null,
+        "SELECT": null,
+        "START": null
+    },
+    "formato_6": {
+        "LP": null,
+        "MP": null,
+        "HP": null,
+        "LK": null,
+        "MK": null,
+        "HK": null,
+        "SELECT": null,
+        "START": null
+    },
+    "formato_8": {
+        "LP": null,
+        "MP": null,
+        "HP": null,
+        "TR": null,
+        "LK": null,
+        "MK": null,
+        "HK": null,
+        "BR": null,
+        "SELECT": null,
+        "START": null
+    }
+}

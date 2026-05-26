@@ -1,0 +1,28 @@
+{
+  "schema": "joystick_overlay.migrations_index/v1",
+  "data_version_current_product": "5",
+  "ordering": "strict_list",
+  "migrations": [
+    {
+      "migration_id": "2026-05-13_semantic_binding_v4",
+      "manifest": "manifests/2026-05-13_semantic_binding_v4.json",
+      "from_data_version": "3",
+      "to_data_version": "4",
+      "platforms": ["linux", "windows"]
+    },
+    {
+      "migration_id": "2026-05-12_bindings_sidecars_v5",
+      "manifest": "manifests/2026-05-12_bindings_sidecars_v5.json",
+      "from_data_version": "4",
+      "to_data_version": "5",
+      "platforms": ["linux", "windows"]
+    }
+  ],
+  "policies": {
+    "on_unknown_current_version": "fail",
+    "on_gap_in_chain": "fail",
+    "require_lockfile": true,
+    "lockfile_path": "user/.migration_lock",
+    "applied_log_path": "user/migrations_applied.jsonl"
+  }
+}

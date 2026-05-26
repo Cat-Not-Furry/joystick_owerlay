@@ -1,0 +1,17 @@
+{
+  "schema": "joystick_overlay.semantic_tokens/v1",
+  "fight_stick_core": [
+    "LP",
+    "MP",
+    "HP",
+    "LK",
+    "MK",
+    "HK",
+    "TR",
+    "BR"
+  ],
+  "console_face": ["A", "B", "X", "Y", "L", "R", "ZL", "ZR", "LB", "RB", "LT", "RT"],
+  "neo_geo_labels": ["A", "B", "C", "D", "AB", "AC", "BD", "CD"],
+  "system": ["START", "SELECT"],
+  "notes": "Tokens canónicos en MAYÚSCULAS para semantic_binding y packs semánticos; el código normaliza alias."
+}

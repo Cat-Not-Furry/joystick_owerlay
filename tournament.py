@@ -2,6 +2,8 @@ import os
 import sys
 import pygame
 
+import engine_sys_path  # noqa: F401, E402
+
 import main as main_app
 from profiles import load_profiles_data, save_profiles_data, set_active_profile
 from utils import set_ui_font_family

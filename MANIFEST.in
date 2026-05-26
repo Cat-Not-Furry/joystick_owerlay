@@ -1,0 +1,5 @@
+graft arcade/assets
+graft configs
+graft docs
+include .joystick_version
+include LICENSE

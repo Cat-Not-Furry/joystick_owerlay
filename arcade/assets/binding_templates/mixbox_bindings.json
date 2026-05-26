@@ -1,0 +1,56 @@
+{
+    "formato_4": {
+        "Arriba": 1073741906,
+        "Abajo": 1073741905,
+        "Izquierda": 1073741904,
+        "Derecha": 1073741908,
+        "LP": 102,
+        "LK": 100,
+        "HP": 115,
+        "HK": 97,
+        "SELECT": null,
+        "START": null
+    },
+    "formato_4a": {
+        "Arriba": 1073741906,
+        "Abajo": 1073741905,
+        "Izquierda": 1073741904,
+        "Derecha": 1073741908,
+        "LP": 102,
+        "LK": 100,
+        "HP": 115,
+        "HK": 97,
+        "SELECT": null,
+        "START": null
+    },
+    "formato_6": {
+        "Arriba": 1073741906,
+        "Abajo": 1073741905,
+        "Izquierda": 1073741904,
+        "Derecha": 1073741908,
+        "LP": 102,
+        "MP": 100,
+        "HP": 115,
+        "LK": 97,
+        "MK": 118,
+        "HK": 99,
+        "SELECT": null,
+        "START": null
+    },
+    "formato_8": {
+        "Arriba": 1073741906,
+        "Abajo": 1073741905,
+        "Izquierda": 1073741904,
+        "Derecha": 1073741908,
+        "LP": 102,
+        "MP": 100,
+        "HP": 115,
+        "TR": 97,
+        "LK": 118,
+        "MK": 99,
+        "HK": 120,
+        "BR": 122,
+        "SELECT": null,
+        "START": null
+    }
+}

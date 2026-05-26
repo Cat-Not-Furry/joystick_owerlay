@@ -1,0 +1,11 @@
+{
+  "schema": "joystick_overlay.migration_manifest/v1",
+  "from_data_version": "4",
+  "to_data_version": "5",
+  "implementation": {
+    "function": "migrate_profile_bindings_sidecars_v4_to_v5"
+  },
+  "safety": {
+    "backup_before_write": true
+  }
+}

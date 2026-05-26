@@ -1,0 +1,20 @@
+{
+  "migration_id": "2026-05-13_semantic_binding_v4",
+  "title": "Añadir semantic_binding vacío en profile.json (opción B, modo legacy)",
+  "created": "2026-05-13",
+  "from_data_version": "3",
+  "to_data_version": "4",
+  "platforms": ["linux", "windows"],
+  "description": "Escribe semantic_binding: {} en cada perfil si falta, para datos version 4.",
+  "scope": ["user/profiles/**/profile.json"],
+  "safety": {
+    "dry_run": false,
+    "backup_before_write": true,
+    "idempotent": true
+  },
+  "rollback": "restore_from_backup",
+  "implementation": {
+    "module": "core.data_migrations",
+    "function": "migrate_semantic_binding_v3_to_v4"
+  }
+}

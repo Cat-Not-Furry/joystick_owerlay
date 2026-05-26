@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "joystick_overlay://configs/schema/profile.schema.v3.json",
+  "title": "Joystick Overlay profile.json v3",
+  "type": "object",
+  "properties": {
+    "id": { "type": "string" },
+    "name": { "type": "string" },
+    "button_count": { "type": "integer", "enum": [4, 6, 8] },
+    "layout_four_variant_4a": {
+      "type": "boolean",
+      "description": "Solo con button_count=4: rejilla 4A (3 arriba LP/LK/HP; HK debajo de LP, p. ej. MVS A B C con D bajo A)."
+    },
+    "input_mode": { "type": "string" },
+    "controller_style": { "type": "string" },
+    "icon_pack": { "type": "string" },
+    "semantic_binding": {
+      "type": "object",
+      "description": "Opcional: BTN_1..BTN_8 -> token semántico canónico (opción B). Si falta, modo legacy usa etiquetas de layout.",
+      "additionalProperties": { "type": "string", "pattern": "^[A-Za-z0-9_]+$" }
+    },
+    "button_icons": { "type": "object", "additionalProperties": { "type": "string" } },
+    "key_bindings": {
+      "type": "object",
+      "description": "Opcional en profile.json en disco; bindings activos viven en user/profiles/<id>/key_*.json y se hidratan en memoria."
+    },
+    "joystick_bindings": {
+      "type": "object",
+      "description": "Opcional en profile.json; fuente en disco: user/profiles/<id>/joystick_bindings.json"
+    },
+    "hud_layout": {
+      "type": "object",
+      "description": "Layout HUD: raíz elements/mode_overrides (legado) y/o variants.formato_4|formato_4a|formato_6|formato_8 cada una con elements + mode_overrides."
+    }
+  },
+  "required": ["id", "button_count", "input_mode"]
+}

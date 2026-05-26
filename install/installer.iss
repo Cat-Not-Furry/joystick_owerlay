@@ -1,3 +1,5 @@
+; LEGACY — sustituido por install/windows/setup_wizard.py + joystick-overlay-setup.exe
+; Mantener solo como referencia histórica hasta cierre de validación VM.
 ; HUD Owerlay installer (Windows)
 
 #define MyAppName "HUD Owerlay"

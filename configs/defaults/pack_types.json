@@ -1,0 +1,5 @@
+{
+  "schema": "joystick_overlay.pack_types/v1",
+  "supported_packs": ["default", "mvs", "cps", "ps", "xbox", "ns"],
+  "default_pack": "default"
+}

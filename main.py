@@ -1,5 +1,7 @@
 # main.py - Archivo principal (Windows)
 
+import engine_sys_path  # noqa: F401, E402
+
 import os
 import pygame
 import threading
@@ -69,6 +71,15 @@ from config import (
 	EASTEREGG_MAX_INSTANCES,
 	APP_ID,
 	JSON_DIR,
+	USER_DIR,
+	RESET_LOG_PATH,
+	ASSETS_VERSION_PATH,
+	HUD_VERSION_PATH,
+	get_assets_version,
+	get_data_version,
+	get_runtime_version,
+	ensure_contract_dirs,
+	write_data_version,
 )
 from render import choose_button_format, choose_input_mode, open_profile_config_menu
 from render import draw_hud, load_icons, set_stick_color, set_stick_colors, set_button_colors
@@ -102,6 +113,8 @@ from utils import (
 	get_installed_version,
 )
 from maps.input_reader import poll_pygame_keyboard_if_needed
+from core.assets_resolver import resolve_icons_map, clear_cache as clear_assets_cache
+from core.data_migrations import CURRENT_DATA_VERSION, migrate_if_needed
 from training import (
 	create_training_state,
 	start_recording,
@@ -114,7 +127,7 @@ from training import (
 	sequence_to_dict,
 )
 from application_context import ApplicationContext
-from state_manager import (
+from core.state_manager import (
 	StateManager,
 	STOP,
 	BootState,
@@ -144,14 +157,13 @@ def _now_str():
 
 
 def get_temp_reset_log_path():
-	return os.path.join(tempfile.gettempdir(), f"{APP_ID}_reset.log")
+	return RESET_LOG_PATH
 
 
 def _safe_write_log(base_path, message):
 	try:
-		logs_dir = os.path.join(base_path, "logs")
-		os.makedirs(logs_dir, exist_ok=True)
-		log_file = os.path.join(logs_dir, "reset.log")
+		os.makedirs(base_path, exist_ok=True)
+		log_file = os.path.join(base_path, "reset.log")
 		with open(log_file, "a", encoding="utf-8") as handle:
 			handle.write(message + "\n")
 	except Exception:
@@ -160,6 +172,7 @@ def _safe_write_log(base_path, message):
 
 def _safe_write_temp_log(message):
 	try:
+		os.makedirs(os.path.dirname(get_temp_reset_log_path()), exist_ok=True)
 		with open(get_temp_reset_log_path(), "a", encoding="utf-8") as handle:
 			handle.write(message + "\n")
 	except Exception:
@@ -167,7 +180,7 @@ def _safe_write_temp_log(message):
 
 
 def _backup_and_clear_data():
-	base = JSON_DIR
+	base = USER_DIR
 	if not os.path.exists(base):
 		msg = f"[{_now_str()}][reset] Solicitud de reset sin datos existentes."
 		print(msg)
@@ -186,7 +199,7 @@ def _backup_and_clear_data():
 		msg = f"[{_now_str()}][reset] Backup creado en: {backup}"
 		print(msg)
 		_safe_write_log(backup, msg)
-		_safe_write_log(JSON_DIR, msg)
+		_safe_write_log(USER_DIR, msg)
 	except Exception as err:
 		error_message = f"[{_now_str()}][reset][ERROR] Fallo en reset: {type(err).__name__}: {repr(err)}"
 		print(error_message)
@@ -199,8 +212,9 @@ def _backup_and_clear_data():
 
 def _confirm_reset_interactive():
 	if sys.stdin and sys.stdin.isatty():
-		print("Deseas eliminar datos de usuario? (se creara backup) [y/N]: ", end="")
-		return input().strip().lower() == "y"
+		print(f"Se borrará el directorio de datos de usuario: {USER_DIR}")
+		print("Confirma reset de datos? [y/N]: ", end="")
+		return input().strip().lower() in ("y", "yes", "s", "si")
 	try:
 		import tkinter as tk
 		from tkinter import messagebox
@@ -209,7 +223,7 @@ def _confirm_reset_interactive():
 		root.withdraw()
 		result = messagebox.askyesno(
 			"HUD Owerlay",
-			"Deseas eliminar datos de usuario?\nSe creara un backup.",
+			f"Se borrará el directorio de datos de usuario:\n{USER_DIR}\n\n¿Deseas continuar?",
 		)
 		root.destroy()
 		return result
@@ -258,6 +272,7 @@ def _early_cli(argv):
 		return _handle_reset_interactive()
 	if args.do_reset_data:
 		_backup_and_clear_data()
+		write_data_version(CURRENT_DATA_VERSION)
 		return True
 	if args.version:
 		print(f"project={get_project_version()} installed={get_installed_version()}")
@@ -266,6 +281,31 @@ def _early_cli(argv):
 		_run_doctor()
 		return True
 	return False
+
+
+def _preflight_startup():
+	ensure_contract_dirs()
+	assets_version = get_assets_version()
+	if not assets_version:
+		print(f"[ERR] assets inválidos: falta {ASSETS_VERSION_PATH}")
+		return False
+	runtime_version = get_runtime_version()
+	if not runtime_version:
+		print(f"[ERR] runtime inválido: falta {HUD_VERSION_PATH}")
+		return False
+	data_version_raw = get_data_version(default_version="0")
+	try:
+		data_version = int(data_version_raw)
+	except Exception:
+		data_version = 0
+	if data_version < CURRENT_DATA_VERSION:
+		result = migrate_if_needed()
+		print(f"[INFO] Migración de datos: {result}")
+		clear_assets_cache()
+	elif data_version > CURRENT_DATA_VERSION:
+		print(f"[ERR] data_version ({data_version}) mayor que soportado ({CURRENT_DATA_VERSION}).")
+		return False
+	return True
 
 
 def _set_window_size(width, height, title):
@@ -968,7 +1008,8 @@ def _run_hud_main_loop(
 ):
 	labels = get_button_labels(button_count)
 	tournament_mode = bool(force_tournament)
-	load_icons(button_count, profile["button_icons"], enable_icons=not tournament_mode)
+	resolved_icons = resolve_icons_map(profile["id"], button_count)
+	load_icons(button_count, resolved_icons, enable_icons=not tournament_mode)
 	set_stick_color(profile["joystick_color"])
 	set_stick_colors(
 		profile.get("joystick_knob_color", profile["joystick_color"]),
@@ -1200,6 +1241,8 @@ def main():
 	global _current_window_mode
 	if _early_cli(sys.argv):
 		sys.exit(0)
+	if not _preflight_startup():
+		sys.exit(1)
 	pygame.init()
 	os.environ["SDL_VIDEO_WINDOW_POS"] = "100,100"
 	_current_window_mode = "floating_hint"

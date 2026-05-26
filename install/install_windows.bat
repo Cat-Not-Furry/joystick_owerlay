@@ -1,25 +1,12 @@
 @echo off
 setlocal
-
-set "SCRIPT_DIR=%~dp0"
-for %%I in ("%SCRIPT_DIR%..") do set "ROOT=%%~fI"
-set "DIST=%ROOT%\dist\hud_owerlay"
-set "ISS=%SCRIPT_DIR%installer.iss"
-
-if not exist "%DIST%\hud_owerlay.exe" (
-	echo No se encontro build en: %DIST%
-	echo Ejecuta primero PyInstaller.
-	exit /b 1
-)
-
-if not exist "%ISS%" (
-	echo No se encontro el script del instalador: %ISS%
-	exit /b 1
-)
-
-echo Build detectado en %DIST%
-echo Script del instalador: %ISS%
-echo Para crear instalador .exe compila install\installer.iss con Inno Setup.
-echo Salida esperada: hud_owerlay_installer.exe
-
+echo Joystick Owerlay — build del instalador
+echo.
+echo 1) Construya primero dist\joystick-overlay\ con PyInstaller (ver constructor.md)
+echo 2) Empaquete release.zip con arcade\, configs\, entrypoints y install\
+echo 3) Ejecute:
+echo    pyinstaller install\windows\setup_wizard.py --name joystick-overlay-setup --onefile --noconsole
+echo    joystick-overlay-setup.exe --zip release.zip
+echo.
+echo Inno Setup (installer.iss) esta obsoleto.
 endlocal
