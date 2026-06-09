@@ -44,7 +44,7 @@ Lógica en [arcade/engine/profiles/hud_layout.py](../../arcade/engine/profiles/h
 1. Instalador o ZIP portable según [instalación](installation.md).
 2. Comprobar `cli.py run`, `config`, `tournament`, `doctor`, `--help`.
 3. Desde configuración, **Actualizar overlay** (ZIP de release) y revisar `user\update.log` si falla.
-4. Verificar HUD estable sin parpadeo (ventana fija Win32).
+4. Verificar HUD estable; ventana redimensionable/maximizable por marco Win32 (cooldown VIDEORESIZE).
 5. Confirmar que *Configurar perfiles* **no** muestra opciones de ventana flotante ni videoresize.
 
 **Más detalles:** [referencia de layout](../reference/layout_reference.md).

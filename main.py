@@ -78,6 +78,7 @@ from config import (
 	get_assets_version,
 	get_data_version,
 	get_runtime_version,
+	get_active_bindings_format_key,
 	ensure_contract_dirs,
 	write_data_version,
 )
@@ -310,7 +311,7 @@ def _preflight_startup():
 
 def _set_window_size(width, height, title):
 	_debug_menu(f"_set_window_size({width}x{height})")
-	screen = pygame.display.set_mode((width, height))
+	screen = pygame.display.set_mode((width, height), pygame.RESIZABLE)
 	pygame.display.set_caption(title)
 	track_set_mode()
 	return screen
@@ -764,6 +765,9 @@ def _apply_main_menu_resize(screen, pending_resize, ignore_videoresize):
 	cur_w, cur_h = screen.get_size()
 	if abs(new_w - cur_w) <= VIDEORESIZE_TOLERANCE_PX and abs(new_h - cur_h) <= VIDEORESIZE_TOLERANCE_PX:
 		return screen
+	screen = pygame.display.set_mode((new_w, new_h), pygame.RESIZABLE)
+	track_set_mode()
+	_debug_count_set_mode()
 	return screen
 
 
@@ -771,7 +775,7 @@ def show_main_menu(screen, profile_data=None):
 	_debug_menu("show_main_menu INICIO")
 	options = ["Iniciar HUD", "Configurar perfiles", "Salir"]
 	selected = 0
-	ignore_videoresize = True
+	ignore_videoresize = False
 	clock = pygame.time.Clock()
 
 	while True:
@@ -882,8 +886,13 @@ def _run_keyboard_mapping_flow(screen, profile, button_count, interactive_setup)
 		if not interactive_setup:
 			print("[WARN] Perfil sin key_bindings en modo no interactivo.")
 			return False, screen
+		fmt = get_active_bindings_format_key(profile)
+		im = profile.get("input_mode", "teclado")
+		pid = profile["id"]
 		mapped, new_screen = _run_secondary_selector(
-			"Mapeo teclado", MAPPER_WINDOW_SIZE, lambda s: map_keys(s, button_count)
+			"Mapeo teclado",
+			MAPPER_WINDOW_SIZE,
+			lambda s: map_keys(s, button_count, pid, fmt, im),
 		)
 		if mapped:
 			profile["key_bindings"] = mapped
@@ -906,6 +915,8 @@ def _run_joystick_mapping_flow(screen, profile, button_count, selected_device_pa
 				show_error=False,
 				device_path=selected_device_path,
 				controller_style=profile.get("controller_style", "default"),
+				profile_id=profile["id"],
+				format_key=get_active_bindings_format_key(profile),
 			),
 		)
 		if not mapped:
@@ -982,6 +993,11 @@ def _apply_hud_resize(screen, pending_resize, ignore_videoresize):
 	new_w = max(MIN_WINDOW_WIDTH, pending_resize[0])
 	new_h = max(MIN_WINDOW_HEIGHT, pending_resize[1])
 	cur_w, cur_h = screen.get_size()
+	if abs(new_w - cur_w) <= VIDEORESIZE_TOLERANCE_PX and abs(new_h - cur_h) <= VIDEORESIZE_TOLERANCE_PX:
+		return screen
+	screen = pygame.display.set_mode((new_w, new_h), pygame.RESIZABLE)
+	track_set_mode()
+	_debug_count_set_mode()
 	return screen
 
 
@@ -1034,7 +1050,7 @@ def _run_hud_main_loop(
 	bg = get_background_color(profile_data.get("capture_mode", "normal"))
 	target_fps = TOURNAMENT_FPS if tournament_mode else FPS
 	training_state = create_training_state()
-	ignore_videoresize = True
+	ignore_videoresize = False
 	while running:
 		keys = pygame.key.get_pressed()
 		if input_mode in ("teclado", "hitbox", "mixbox"):

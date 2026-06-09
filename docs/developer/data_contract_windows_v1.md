@@ -66,8 +66,8 @@ Capa **Adapted** frente a Linux (`motivo_plataforma: Win32`, `drift_permitido: S
 | Campo / comportamiento | Linux | Windows |
 |------------------------|-------|---------|
 | `window_mode` (`floating_hint` / `normal`) | Configurable en menú | **No expuesto en UI**; normalizar a `normal` al cargar |
-| `ignore_videoresize` | Toggle en menú | **No expuesto en UI**; política fija: ignorar redimensionado |
-| Ventana redimensionable (`pygame.RESIZABLE`) | Sí (WM tiling) | **No** — tamaño fijo para captura OBS estable |
+| `ignore_videoresize` | Toggle en menú | **No expuesto en UI**; normalizar a `false` al cargar; runtime procesa `VIDEORESIZE` con cooldown |
+| Ventana redimensionable (`pygame.RESIZABLE`) | Sí (WM tiling) | **Sí** — marco Win32 (maximizar/minimizar/redimensionar); sin toggles en menú |
 
 Los campos pueden persistir en `profiles_index.json` por compatibilidad de import desde Linux; el runtime Windows los sobrescribe al cargar. No validar `floating_hint` como opción activa en W.
 

@@ -126,7 +126,7 @@ def _default_window_mode():
 
 
 def _normalize_window_policy(window_mode):
-	"""Win32: ventana fija; perfiles Linux se normalizan al cargar."""
+	"""Win32: sin floating_hint en UI; perfiles Linux se normalizan al cargar."""
 	if os.name == "nt":
 		return "normal"
 	return _validate_choice(
@@ -137,9 +137,9 @@ def _normalize_window_policy(window_mode):
 
 
 def _normalize_ignore_videoresize(value):
-	"""Win32: siempre ignorar VIDEORESIZE (anti-parpadeo fijo)."""
+	"""Win32: resize permitido en runtime; campo no expuesto en UI (coherencia JSON)."""
 	if os.name == "nt":
-		return True
+		return False
 	return bool(value)
 
 def _default_capture_mode():

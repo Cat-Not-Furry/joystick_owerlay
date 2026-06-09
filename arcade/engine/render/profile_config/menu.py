@@ -61,7 +61,7 @@ class ProfileConfigMenu:
 		return {
 			"active_profile": self.profile_data["active_profile"],
 			"window_mode": "normal",
-			"ignore_videoresize": True,
+			"ignore_videoresize": False,
 			"capture_mode": self.profile_data.get("capture_mode", "normal"),
 			"ui_font_family": self.profile_data.get("ui_font_family", "JetBrainsMono"),
 			"backups_enabled": bool(self.profile_data.get("backups_enabled", True)),

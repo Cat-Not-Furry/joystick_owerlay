@@ -326,12 +326,15 @@ Por qué: Reducir soporte silencioso.
 Portabilidad Linux: ver B.3 (`L-PREFLIGHT`).  
 Evidencia: —
 
-**W-OPS-001** — Estado: `pendiente`  
-Fecha: —  
-Qué: Cierre de validación manual en entorno Windows real.  
+**W-OPS-001** — Estado: `pendiente` (código listo; requiere build nuevo en VM)  
+Fecha: 2026-05-26  
+Qué: Cierre de validación manual en entorno Windows real tras correcciones reportadas por testers.  
 Por qué: Garantía antes de distribución.  
+Hallazgos testers (2026-05): crash `evdev` al arranque; crash `map_keys` sin `profile_id`/`format_key`; ventana no redimensionable.  
+Criterios de cierre: `python main.py` sin `evdev`; mapeo teclado/joystick completo; ventana maximiza/redimensiona (sin toggles WM en Config); `pytest tests/` verde.  
+Acción release: nuevo `release.zip` según `constructor.md` §2–3 (reemplaza copia `joystick_owerlay` anterior).  
 Portabilidad Linux: `n/a`.  
-Evidencia: —
+Evidencia: `CHANGELOG.md` [Unreleased] Windows; `tests/test_maps_import_win32.py`.
 
 **W-OPS-002** — Estado: `en_progreso`  
 Fecha: 2026-05-26  

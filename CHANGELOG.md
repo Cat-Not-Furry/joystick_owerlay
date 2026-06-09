@@ -6,6 +6,18 @@ Formato: [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). Versionado
 
 ## [Unreleased]
 
+### Windows (`hud_owerlay`)
+
+#### Fixed
+
+- **Testers:** `map_keys` en `main.py` — pasar `profile_id`, `format_key` e `input_mode` (crash en mapeo teclado).
+- **Testers:** `map_joystick_buttons` con `profile_id` y `format_key` para persistencia en perfil.
+- **Testers:** import condicional de `evdev` (solo Linux); joysticks vía pygame en Win32.
+
+#### Changed
+
+- Ventana Win32 redimensionable/maximizable por marco del SO (`RESIZABLE` + `VIDEORESIZE` con cooldown); sin toggles `window_mode` / `ignore_videoresize` en menú config.
+
 ### Cross-repo / contrato
 
 - Validación humana Windows (Fase 4 checklist) pendiente de mantenedor.

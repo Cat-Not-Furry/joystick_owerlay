@@ -38,7 +38,7 @@ windows_ref: 0.3.2 (2026-05-26, gate P0/P1/P2)
 | CI / QA automatizado | PARCIAL (ci.yml) | PARCIAL (ci.yml) | PARCIAL | Canonical | Funcional | No | — | — | OPS-001 | L/W: pytest + version + doc links |
 | ZIP perfil (import) | OK | OK | Igual | Canonical | Exacta | No | — | — | — | W: `profile_export.py` → `extract_zip_safely` |
 | Monolitos / deuda LOC | PARCIAL | PARCIAL | PARCIAL | Canonical | Pendiente | Sí | — | — | ARCH-001, ARCH-002 | L: `main.py` ~140 LOC; W: `profile_config/` + hit-test editor (PARCIAL) |
-| Política ventana Win32 | N/E (WM tiling) | OK (fija, sin WM opts) | Adaptado válido | Adapted | Funcional | Sí | Win32 | — | — | W: sin `window_mode`/`ignore_videoresize` en UI; `RESIZABLE` deshabilitado |
+| Política ventana Win32 | N/E (WM tiling) | OK (resize SO, sin WM opts) | Adaptado válido | Adapted | Funcional | Sí | Win32 | — | — | W: sin `window_mode`/`ignore_videoresize` en UI; `RESIZABLE` + cooldown VIDEORESIZE |
 | Canal release usuario | PARCIAL | PARCIAL | PARCIAL | Canonical | Pendiente | No | — | PAR-005B | OPS-002 | L/W: `CHANGELOG.md` 0.3.2 con subsecciones por plataforma |
 | Tooling / higiene Git | PARCIAL | PARCIAL | PARCIAL | Canonical | Funcional | Sí | — | — | OPS-003 | L: ruff/radon warn CI; W: port vs HEAD |
 | Docs layout vs árbol | OK | PARCIAL | PARCIAL | Canonical | Pendiente | No | — | — | DOC-001 | W: `repository_layout.md` vs árbol real |

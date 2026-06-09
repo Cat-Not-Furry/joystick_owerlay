@@ -1,16 +1,16 @@
 # Solución de problemas (Windows)
 
-**Qué cubre esta guía:** incidencias habituales en Windows (ventana fija, captura OBS, rutas de datos, actualización). **Audiencia:** usuarios del HUD y de *Configurar perfiles*. **Prerrequisitos:** [inicio rápido](quick_start.md), [índice de documentación](../README.md).
+**Qué cubre esta guía:** incidencias habituales en Windows (ventana, captura OBS, rutas de datos, actualización). **Audiencia:** usuarios del HUD y de *Configurar perfiles*. **Prerrequisitos:** [inicio rápido](quick_start.md), [índice de documentación](../README.md).
 
-## Ventana fija (Win32)
+## Ventana (Win32)
 
-En Windows la ventana del HUD y del menú de configuración **no es redimensionable** por el usuario. Esto evita parpadeos y comportamientos inconsistentes con captura OBS. No hay opciones de «ventana flotante» ni «ignorar VIDEORESIZE» en *Configurar perfiles* — la política es fija en Win32.
+La ventana del HUD y del menú se puede **maximizar, minimizar y redimensionar** con el marco estándar de Windows. No hay opciones de «ventana flotante» ni «ignorar VIDEORESIZE» en *Configurar perfiles* — el comportamiento es fijo en el producto.
 
-Si necesitas otro tamaño, ajusta el layout HUD desde *Editar posición HUD*; el tamaño de ventana de la aplicación sigue siendo el definido por el runtime.
+Si al redimensionar notas parpadeo breve (p. ej. con captura OBS), es normal: el runtime limita la frecuencia de ajuste de tamaño para estabilizar la imagen.
 
 ## Captura OBS
 
-Use el modo **Captura | OBS** en *Configurar perfiles* si su escena requiere chroma key verde. El HUD mantiene tamaño estable para la fuente de ventana en OBS.
+Use el modo **Captura | OBS** en *Configurar perfiles* si su escena requiere chroma key verde. Prefiera tamaño de ventana estable durante la transmisión; evite redimensionar en vivo si la fuente parpadea.
 
 ## Rutas de datos y legado
 
