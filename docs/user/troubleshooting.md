@@ -1,43 +1,46 @@
-# Solución de problemas
+# Solución de problemas (Windows)
 
-**Qué cubre esta guía:** incidencias habituales en Linux (WM tiling, redimensionado de ventana, permisos de entrada, rutas de datos). **Audiencia:** usuarios del HUD y de *Configurar perfiles*. **Prerrequisitos:** [inicio rápido](quick_start.md), [índice de documentación](../README.md). Referencias técnicas del stack: [Fuentes externas verificables](../reference/external_sources.md).
+**Qué cubre esta guía:** incidencias habituales en Windows (ventana fija, captura OBS, rutas de datos, actualización). **Audiencia:** usuarios del HUD y de *Configurar perfiles*. **Prerrequisitos:** [inicio rápido](quick_start.md), [índice de documentación](../README.md).
 
-Las secciones siguientes describen **comportamiento observado** con Pygame y WMs comunes; no sustituyen el manual de tu distribución.
+## Ventana fija (Win32)
 
-## Window managers (tiling)
+En Windows la ventana del HUD y del menú de configuración **no es redimensionable** por el usuario. Esto evita parpadeos y comportamientos inconsistentes con captura OBS. No hay opciones de «ventana flotante» ni «ignorar VIDEORESIZE» en *Configurar perfiles* — la política es fija en Win32.
 
-En i3, bspwm, sway, Hyprland, etc., el WM puede forzar tamaños o ignorar el tamaño inicial de Pygame. Marca la ventana como **flotante** si necesitas tamaño y posición estables.
+Si necesitas otro tamaño, ajusta el layout HUD desde *Editar posición HUD*; el tamaño de ventana de la aplicación sigue siendo el definido por el runtime.
 
-## Anti-parpadeo (VIDEORESIZE)
+## Captura OBS
 
-Si la ventana parpadea o el WM no deja flotar bien, activa **«Ignorar VIDEORESIZE (anti-parpadeo)»** en *Configurar perfiles*. Prueba rápida sin menú:
-
-```bash
-JOYSTICK_IGNORE_VIDEORESIZE=1 python3 main.py
-```
-
-El subsistema de **ventana y vídeo** de SDL (usado por Pygame) documenta APIs de ventana y eventos en la wiki de SDL2; sirve como contexto cuando un WM genera redimensionados agresivos.
-
-## Teclado global (`evdev`)
-
-En *Configurar perfiles* puedes elegir **Teclado global**: se lee un teclado con `evdev` aunque la ventana no tenga foco. Si el dispositivo falla, hay fallback al modo con foco (`pygame`). Con **ninguno (solo con foco)** solo se usa Pygame.
-
-Si hay error de permisos al leer dispositivos, lo habitual en Linux es pertenecer al grupo `input` (el comando `joystick-overlay doctor` lo indica). El siguiente comando amplía permisos de **todo** `event*` y puede degradar seguridad; úsalo solo como medida temporal consciente:
-
-```bash
-sudo chmod a+r /dev/input/event*
-```
+Use el modo **Captura | OBS** en *Configurar perfiles* si su escena requiere chroma key verde. El HUD mantiene tamaño estable para la fuente de ventana en OBS.
 
 ## Rutas de datos y legado
 
-Tras migraciones, pueden existir `user/legacy_bindings.json` y `user/legacy_joystick_bindings.json`. Iconos por defecto: `arcade/assets/icon_packs/`; sustituciones por perfil en `user/profiles/<id>/icons/`. Resolución: `arcade/engine/core/assets_resolver.py`.
+- **Instalado:** `%LOCALAPPDATA%\joystick_owerlay\user\`
+- **Portable:** carpeta `user\` junto al ejecutable
 
-**Más detalles:** [contrato de datos](../developer/data_contract_v1.md), [README raíz](../../README.md).
+Tras migraciones pueden existir `user/legacy_bindings.json` y `user/legacy_joystick_bindings.json`. Iconos por defecto: `arcade/assets/icon_packs/`; sustituciones por perfil en `user/profiles/<id>/icons/`.
+
+**Más detalles:** [contrato de datos Windows](../developer/data_contract_windows_v1.md), [README raíz](../../README.md).
+
+## Actualización fallida
+
+Revise `user\update.log`. Desde *Configurar perfiles → Actualizar overlay* seleccione el ZIP de release, o en terminal:
+
+```bat
+python cli.py --update --zip ruta\release.zip
+```
+
+No se sobrescribe `user/`.
+
+## Diagnóstico
+
+```bat
+python cli.py doctor
+```
+
+**Más detalles:** [doctor](doctor.md).
 
 ## Referencias (externas)
 
-1. [Linux kernel: Input documentation](https://www.kernel.org/doc/html/latest/input/input.html) — subsistema de entrada y dispositivos `evdev`.
-2. [python-evdev: documentación](https://python-evdev.readthedocs.io/en/stable/) — API Python sobre el interfaz de eventos de Linux.
-3. [SDL2: CategoryVideo](https://wiki.libsdl.org/SDL2/CategoryVideo) — subsistema de vídeo/ventana de SDL2 (base de Pygame).
-4. [Pygame: documentación](https://www.pygame.org/docs/) — capa de alto nivel usada por el HUD.
-5. [Índice de fuentes del proyecto](../reference/external_sources.md) — tabla consolidada.
+1. [SDL2: CategoryVideo](https://wiki.libsdl.org/SDL2/CategoryVideo) — subsistema de vídeo/ventana de SDL2 (base de Pygame).
+2. [Pygame: documentación](https://www.pygame.org/docs/) — capa de alto nivel usada por el HUD.
+3. [Índice de fuentes del proyecto](../reference/external_sources.md) — tabla consolidada.

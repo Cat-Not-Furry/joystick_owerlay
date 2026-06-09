@@ -4,15 +4,39 @@ Ejecutar **después** de que `hud_overlay` tenga [audit_contract_v1.md](../devel
 
 **Repositorio objetivo:** `hud_owerlay` (Windows). **No** modificar `hud_overlay` en esta fase salvo sincronización acordada.
 
+## Repositorio
+
+| Variante | Slug Git | Ruta local (agente) | Remoto |
+|----------|----------|---------------------|--------|
+| Linux (canon) | `hud_overlay` | `/home/cipactli_mx/Downloads/hud_overlay` | (remoto del clon local) |
+| Windows | `hud_owerlay` | `/home/cipactli_mx/Downloads/hud_owerlay` | https://github.com/Cat-Not-Furry/joystick_owerlay |
+
+**Referencia Linux verificada:** commit **`a19edb8`** (release **0.3.2**, 2026-05-26).
+
+**Referencia Windows verificada (Fase 2):** commit **`e924195`** (2026-05-18).
+
 ## Prerrequisitos
 
 - Checkout local de `hud_owerlay` con acceso de lectura al código y `docs/`.
 - Misma exclusión habitual de auditoría: sin `venv` obligatorio, sin ejecutar `scripts/` ni `tests/` salvo autorización explícita.
-- Referencia Linux: commit `b31d5d7` y artefactos en `hud_overlay/docs/archive/` y `docs/developer/audit_contract_v1.md`.
+- Referencia Linux: commit **`a19edb8`** y artefactos en `hud_overlay/docs/archive/` y `docs/developer/audit_contract_v1.md`.
 
 ## Criterio de cierre
 
 Un auditor puede comparar Linux vs Windows usando solo **parity_matrix** + **findings_registry**, respondiendo «¿diverge el **contrato observable**?» (no «¿el código es distinto?»).
+
+### Estado Fase 2 (2026-05-26)
+
+| Artefacto | Linux (`a19edb8`) | Windows (`e924195`) |
+|-----------|-------------------|---------------------|
+| `audit_contract_v1.md` v1.1 | OK | OK (sincronizado) |
+| `findings_registry.md` | `last_sync_windows` actualizado | manifestaciones `windows_manifestation` completadas |
+| `parity_matrix.md` v2 | columna Windows rellenada | columna Windows verificada en código |
+| SEC-001 install | mitigado (`safe_zip_update_extract`) | **PARCIAL** — `install_ops.py` L56–57 `extractall` |
+| SEC-003 migración | mitigado (`fcntl.flock`) | **PARCIAL** — `isfile`+`open` sin lock exclusivo |
+| REL-001 | OK (0.3.2 alineado) | **DRIFT** — `.joystick_version` 1.0.0 vs `pyproject` 0.3.1 |
+
+**Gate documental:** cerrado (comparación L↔W solo con matrix + registry). **Gate código:** SEC-001 install Windows y REL-001 siguen abiertos.
 
 ---
 

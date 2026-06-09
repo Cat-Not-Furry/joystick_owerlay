@@ -17,7 +17,7 @@ def main():
 
 	profile_data = load_profiles_data()
 	set_ui_font_family(profile_data.get("ui_font_family", "JetBrainsMono"))
-	main_app._current_window_mode = profile_data.get("window_mode", "floating_hint")
+	main_app._current_window_mode = "normal"
 	screen = main_app._set_window_size(
 		main_app.APP_WINDOW_WIDTH, main_app.APP_WINDOW_HEIGHT, "Configurar perfiles"
 	)

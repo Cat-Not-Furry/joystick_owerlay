@@ -1,0 +1,25 @@
+_SECTION_KEYS = {
+	"General": ["local_backups", "mirror_xdg_profiles"],
+	"Dispositivos": [
+		"active_profile",
+		"button_count",
+		"default_input",
+		"global_keyboard",
+		"tournament_mode",
+		"hitbox_alt_layout",
+	],
+	"Visualizacion": [
+		"capture_mode",
+		"mono_font",
+		"controller_style",
+		"change_icon",
+		"toggle_icon_pack_lock",
+		"joystick_color",
+		"button_color",
+		"joystick_color_hex",
+		"edit_hud_layout",
+	],
+	"Perfiles": ["create_profile", "rename_profile", "export_profile", "import_profile"],
+	"Extensiones": ["extensions_info"],
+	"Avanzado": ["update_overlay"],
+}

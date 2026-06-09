@@ -333,12 +333,18 @@ Por qué: Garantía antes de distribución.
 Portabilidad Linux: `n/a`.  
 Evidencia: —
 
-**W-OPS-002** — Estado: `pendiente`  
-Fecha: —  
+**W-OPS-002** — Estado: `en_progreso`  
+Fecha: 2026-05-26  
 Qué: Identidad de instalación y versión publicada alineadas con política de release.  
 Por qué: Upgrades y soporte.  
 Portabilidad Linux: `n/a`.  
-Evidencia: —
+Evidencia: `.joystick_version` / `pyproject.toml` / `version.txt` → 0.3.2; `check_version_alignment.py` en CI.
+
+**W-GATE-032** — Estado: `en_progreso` (código; Fase 4 humano pendiente)  
+Fecha: 2026-05-26  
+Qué: Gate release Windows 0.3.2 — SEC-001 install, SEC-003 lock, REL-001, CI, `update_overlay` vía `cli --update --zip`, política Win32 sin WM tiling, ARCH-002 B (`render/profile_config/`).  
+Por qué: Paridad contractual Adapted frente a Linux `a19edb8`.  
+Evidencia: `findings_registry.md`, `parity_matrix.md`, `CHANGELOG.md` [0.3.2] Windows.
 
 **W-OPS-003** — Estado: `pendiente` (producto en campo; PAR-005B)  
 Fecha: —  
@@ -485,6 +491,7 @@ Evidencia: `update.sh`, UI de actualización; falta definición de release Linux
 | 2026-05-18 | **Fase 2 handoff:** bitácora fusionada desde Linux; Parte A revisada contra árbol Windows; `body/` consumida y retirada. |
 | 2026-05-22 | Bloque: contratos y cierres explícitos \| Antes: mezcla `hecho`/`OK`/SEC sin ejes \| Después: audit_contract **v1.1**, parity_matrix **v2**, § Jerarquía + Matriz de cierre + columnas PAR `tipo`/`drift` \| Motivo: cerrados mal interpretados (p. ej. W-UPD-ZIP-001 vs PAR-005A). Commit ref. `5dd784e`. |
 | 2026-05-25 | Corrección para traslado a Windows \| Antes: mezcla de slug real, rutas externas y producto en la Parte Linux/Windows \| Después: `hud_overlay`/`hud_owerlay` como repos, `joystick_overlay` como ruta externa Linux, Parte B marcada como base Linux verificable \| Motivo: copiar bitácora a Windows sin invertir IDs ni confundir implementación con contrato. |
+| 2026-05-26 | **Fase 2 cierre documental** \| `linux_ref` → `a19edb8` (0.3.2); repos en `windows_parity_rollout.md`; `parity_matrix` + `findings_registry` sincronizados desde Linux \| Evidencia W: SEC-001 `install_ops.extractall` L56–57; SEC-003 lock no atómico; REL-001 drift versión; ARCH-002 `run_hud_layout_editor` ~409 LOC \| Gate documental: comparación L↔W solo matrix+registry OK. |
 
 ---
 

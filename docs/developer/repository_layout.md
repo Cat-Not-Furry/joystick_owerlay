@@ -18,12 +18,13 @@ Joystick Owerlay se distribuye como paquete Python con **entrypoints en la raíz
 | [`tests/`](../../tests/) | Pruebas (no ejecutar como sustituto del producto). |
 | [`user/`](../../user/) | Datos de usuario en desarrollo (canon portable; no versionar contenido personal). |
 | [`.joystick_version`](../../.joystick_version) | Versión runtime (`joystick-overlay --version`). |
-
-**Nota:** No hay carpeta `scripts/` en la raíz (a diferencia del repo Linux `hud_overlay`). Instalación usuario final: ver [`docs/user/installation.md`](../user/installation.md) y [`constructor.md`](../../constructor.md).
+| [`scripts/`](../../scripts/) | Utilidades CI: `check_version_alignment.py`, `check_doc_links.py`. |
 
 ## Paquete bajo `arcade/engine/`
 
 Setuptools declara paquetes con origen en [`arcade/engine`](../../arcade/engine). Ahí viven `config`, `profiles`, `render`, `maps`, `core`, `training`, `utils`.
+
+Dentro de `render/`, el menú de configuración de perfiles vive en el paquete [`render/profile_config/`](../../arcade/engine/render/profile_config/) (handlers por sección, modales, constantes). El módulo [`render/profile_config_menu.py`](../../arcade/engine/render/profile_config_menu.py) es un shim fino que reexporta la API pública.
 
 ## Assets
 

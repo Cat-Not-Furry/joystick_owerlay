@@ -1,17 +1,17 @@
 # Doctor de entorno (`joystick-overlay doctor`)
 
-Comando de diagnóstico **sin ventana Pygame**: imprime comprobaciones en la terminal. Útil antes de instalar menús o cuando el HUD falla al arrancar.
+Comando de diagnóstico **sin ventana Pygame**: imprime comprobaciones en la terminal. Útil cuando el HUD falla al arrancar o tras una actualización.
 
 ## Cómo ejecutarlo
 
-```bash
-joystick-overlay doctor
+```bat
+python cli.py doctor
 ```
 
-o, desde el clon con `venv` activo:
+o:
 
-```bash
-python3 doctor.py
+```bat
+python doctor.py
 ```
 
 Implementación: [`doctor.py`](../../doctor.py) (la CLI delega en el mismo módulo vía [`cli.py`](../../cli.py)).
@@ -20,11 +20,9 @@ Implementación: [`doctor.py`](../../doctor.py) (la CLI delega en el mismo módu
 
 | Comprobación | Significado |
 | ------------ | ----------- |
-| **Ruta de datos** | Muestra el directorio de usuario canónico (`get_user_dir()`) y la ruta de espejo opcional (`BACKUP_PROFILES_ROOT`). |
-| **Sesión gráfica** | Variables `WAYLAND_DISPLAY`, `DISPLAY`, `XDG_SESSION_TYPE`, `XDG_CURRENT_DESKTOP`. Si no hay Wayland ni X11, avisa que el HUD necesita sesión gráfica. |
-| **`/dev/input`** | Existe el directorio; cuenta dispositivos `event*`. |
-| **Grupo `input`** | Si tu usuario no está en el grupo `input`, puede faltar acceso a evdev; el doctor sugiere `sudo usermod -aG input $USER` (requiere cerrar sesión o relogin). |
-| **`pygame` / `evdev`** | Importación de módulos; errores aquí suelen indicar `venv` roto o dependencias no instaladas. |
+| **Ruta de datos** | Directorio de usuario canónico (`get_user_dir()`) y rutas de respaldo si aplican. |
+| **`pygame`** | Importación del módulo; errores suelen indicar `venv` roto o dependencias no instaladas. |
+| **Versión runtime** | Alineación con `.joystick_version`. |
 
 No modifica disco ni perfiles; solo lectura e imports.
 

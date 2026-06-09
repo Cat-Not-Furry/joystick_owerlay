@@ -1,14 +1,23 @@
-# Inicio rápido
+# Inicio rápido (Windows)
 
-Tras [instalar](installation.md) con `venv` activo:
+Tras [instalar](installation.md):
 
-```bash
-python3 main.py
+```bat
+python main.py
 ```
 
-- **Configurar perfiles:** desde el menú o `python3 configure.py` / `joystick-overlay config`.
-- **Modo torneo:** `python3 tournament.py` o `joystick-overlay tournament`.
-- **Diagnóstico:** `joystick-overlay doctor`.
+o con la CLI unificada:
+
+```bat
+python cli.py run
+python cli.py config
+python cli.py tournament
+python cli.py doctor
+```
+
+- **Configurar perfiles:** desde el menú o `python cli.py config`.
+- **Modo torneo:** `python cli.py tournament`.
+- **Diagnóstico:** `python cli.py doctor`.
 
 ### Modo entrenamiento (HUD activo)
 
@@ -18,7 +27,7 @@ python3 main.py
 
 En el menú principal o durante el HUD, **=** abre otra instancia (límite de seguridad: 3 simultáneas).
 
-**Más detalles:** [README raíz](../../README.md), [contrato de datos](../developer/data_contract_v1.md).
+**Más detalles:** [README raíz](../../README.md), [contrato de datos Windows](../developer/data_contract_windows_v1.md).
 
 ## Editor de posición HUD
 
@@ -28,14 +37,14 @@ En el menú principal o durante el HUD, **=** abre otra instancia (límite de se
 4. **G** snap; **1** rejilla 4 px; **2** rejilla 8 px.
 5. **S** guarda; **Esc** cancela; **R** restablece. Solapamiento fuerte muestra aviso en rojo.
 
-Lógica en [arcade/engine/profiles/hud_layout.py](../../arcade/engine/profiles/hud_layout.py); estado en [arcade/engine/core/state_manager.py](../../arcade/engine/core/state_manager.py). Coordenadas base de referencia: **375×175** (escalado en ejecución).
+Lógica en [arcade/engine/profiles/hud_layout.py](../../arcade/engine/profiles/hud_layout.py). Coordenadas base de referencia: **375×175** (escalado en ejecución).
 
 ## Checklist manual sugerido
 
-1. `./install.sh` flujo `n` y flujo `s` (global y/o usuario).
-2. Comprobar `joystick-overlay`, `config`, `tournament`, `doctor`, `--help`.
-3. Abrir desde el menú de aplicaciones las tres entradas si se generaron `.desktop`.
-4. Desde configuración, **Actualizar overlay** y revisar `user/update.log` si falla.
-5. Verificar HUD sin hooks registrados.
+1. Instalador o ZIP portable según [instalación](installation.md).
+2. Comprobar `cli.py run`, `config`, `tournament`, `doctor`, `--help`.
+3. Desde configuración, **Actualizar overlay** (ZIP de release) y revisar `user\update.log` si falla.
+4. Verificar HUD estable sin parpadeo (ventana fija Win32).
+5. Confirmar que *Configurar perfiles* **no** muestra opciones de ventana flotante ni videoresize.
 
 **Más detalles:** [referencia de layout](../reference/layout_reference.md).

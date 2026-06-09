@@ -70,18 +70,6 @@ def run_training_window(sequence_path):
 		return running, pending_resize
 
 	def _apply_training_resize(screen, pending_resize):
-		if pending_resize is None:
-			return screen
-		now_ms = time.time() * 1000
-		if now_ms - get_last_set_mode_time_ms() < VIDEORESIZE_COOLDOWN_MS:
-			return screen
-		new_w = max(MIN_WINDOW_WIDTH, pending_resize[0])
-		new_h = max(MIN_WINDOW_HEIGHT, pending_resize[1])
-		cur_w, cur_h = screen.get_size()
-		if abs(new_w - cur_w) <= VIDEORESIZE_TOLERANCE_PX and abs(new_h - cur_h) <= VIDEORESIZE_TOLERANCE_PX:
-			return screen
-		screen = pygame.display.set_mode((new_w, new_h), pygame.RESIZABLE)
-		track_set_mode()
 		return screen
 
 	with open(sequence_path, "r") as f:
@@ -101,7 +89,7 @@ def run_training_window(sequence_path):
 		button_count = 6
 
 	pygame.init()
-	screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.RESIZABLE)
+	screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 	pygame.display.set_caption("Joystick Overlay — Modo entrenamiento")
 	track_set_mode()
 

@@ -5,8 +5,8 @@ Complementa el tablero `PAR-*` de [bitacora.md](bitacora.md). Hallazgos globales
 ```
 matrix_version: 2
 parity_layers: 2026-05-18
-linux_ref: b31d5d7 (2026-05-14)
-windows_ref: 5dd784e+port (2026-05-22, capas v1.1)
+linux_ref: a19edb8 (0.3.2, 2026-05-26)
+windows_ref: 0.3.2 (2026-05-26, gate P0/P1/P2)
 ```
 
 ## Leyenda de columnas
@@ -26,28 +26,26 @@ windows_ref: 5dd784e+port (2026-05-22, capas v1.1)
 
 | Sistema | Linux | Windows | Estado | tipo | paridad | drift_permitido | motivo_plataforma | linked_par | linked_sec | Notas |
 |---------|-------|---------|--------|------|---------|-----------------|-------------------|------------|------------|-------|
-| Update ZIP (runtime) | OK (mecánica PAR-005A) | PARCIAL (cli seguro; install `extractall`) | Transicional | Transitional | Pendiente | No | installer | PAR-005A, PAR-005B | SEC-001 | W: `cli.py` + `safe_zip_extract`; `install/windows/install_ops.py` L56–57 |
-| Versión runtime | OK | DRIFT | Divergencia contractual | Canonical | Pendiente | No | — | PAR-002 | REL-001 | W: `.joystick_version` 1.0.0 vs `pyproject.toml` 0.3.1 |
+| Update ZIP (runtime) | OK (mecánica PAR-005A) | OK (cli + install `safe_zip_extract`) | PARCIAL | Canonical | Funcional | No | installer | PAR-005A, PAR-005B | SEC-001 | L: `safe_zip_update_extract`; W: `cli.py` + `install_ops` alineados |
+| Versión runtime | OK | OK | Igual | Canonical | Exacta | No | — | PAR-002 | REL-001 | W: 0.3.2 alineado; CI `check_version_alignment` |
 | Input backend | evdev | keyboard | Adaptado válido | Adapted | Funcional | Sí | Win32 | — | — | No es deuda; backends distintos |
 | Persistencia canon `user/` | OK | OK (código) | Adaptado válido | Adapted | Funcional | Sí | AppData | PAR-001 | — | W: `%LOCALAPPDATA%\joystick_owerlay\user\` + portable |
-| Reset dos fases | implementado | implementado (VM pendiente) | PARCIAL | Canonical | Pendiente | No | — | PAR-003 | — | W: `main.py` `--reset-data` / `--do-reset-data`; validación W-OPS-001 |
+| Reset dos fases | implementado | implementado (VM pendiente) | PARCIAL | Canonical | Pendiente | No | — | PAR-003 | SEC-003 | L/W: lock migración exclusivo (`fcntl` / `msvcrt`) |
 | Hooks / input history | OK | OK | Igual | Canonical | Exacta | No | — | PAR-004 | — | |
-| CLI soporte | OK | OK (flags); ops PARCIAL | PARCIAL | Canonical | Funcional | No | — | PAR-002 | — | Área tablero «CLI» = VM/doc; flags canónicos OK |
-| Instalación / accesos | install.sh | install/windows | PARCIAL | Adapted | Funcional | Sí | installer | PAR-006 | SEC-001 | Evidencia W: `install/windows/`; Inno legado en `install/` |
+| CLI soporte | OK | OK (flags); ops PARCIAL | PARCIAL | Canonical | Funcional | No | — | PAR-002 | — | |
+| Instalación / accesos | install.sh | install/windows | PARCIAL | Adapted | Funcional | Sí | installer | PAR-006 | SEC-001 | Evidencia W: `install/windows/` |
 | Preflight UX | PARCIAL | PARCIAL | PARCIAL | Canonical | Pendiente | No | — | PAR-007 | — | |
-| CI / QA automatizado | ausente | ausente | PARCIAL | Canonical | Pendiente | No | — | — | OPS-001 | |
+| CI / QA automatizado | PARCIAL (ci.yml) | PARCIAL (ci.yml) | PARCIAL | Canonical | Funcional | No | — | — | OPS-001 | L/W: pytest + version + doc links |
 | ZIP perfil (import) | OK | OK | Igual | Canonical | Exacta | No | — | — | — | W: `profile_export.py` → `extract_zip_safely` |
-| Monolitos / deuda LOC | PARCIAL | PARCIAL | PARCIAL | Canonical | Pendiente | Sí | — | — | ARCH-001, ARCH-002 | W: `hud_layout_editor` ~409 LOC |
-| Canal release usuario | PARCIAL | PARCIAL | PARCIAL | Canonical | Pendiente | No | — | PAR-005B | OPS-002 | |
-| Tooling / higiene Git | PARCIAL | PARCIAL | PARCIAL | Canonical | Funcional | Sí | — | — | OPS-003 | Port sin commit vs HEAD |
-| Docs layout vs árbol | OK | PARCIAL | PARCIAL | Canonical | Pendiente | No | — | — | DOC-001 | `repository_layout.md` vs árbol real |
+| Monolitos / deuda LOC | PARCIAL | PARCIAL | PARCIAL | Canonical | Pendiente | Sí | — | — | ARCH-001, ARCH-002 | L: `main.py` ~140 LOC; W: `profile_config/` + hit-test editor (PARCIAL) |
+| Política ventana Win32 | N/E (WM tiling) | OK (fija, sin WM opts) | Adaptado válido | Adapted | Funcional | Sí | Win32 | — | — | W: sin `window_mode`/`ignore_videoresize` en UI; `RESIZABLE` deshabilitado |
+| Canal release usuario | PARCIAL | PARCIAL | PARCIAL | Canonical | Pendiente | No | — | PAR-005B | OPS-002 | L/W: `CHANGELOG.md` 0.3.2 con subsecciones por plataforma |
+| Tooling / higiene Git | PARCIAL | PARCIAL | PARCIAL | Canonical | Funcional | Sí | — | — | OPS-003 | L: ruff/radon warn CI; W: port vs HEAD |
+| Docs layout vs árbol | OK | PARCIAL | PARCIAL | Canonical | Pendiente | No | — | — | DOC-001 | W: `repository_layout.md` vs árbol real |
 
 ## Capa prohibida activa (violaciones `drift_permitido: No`)
 
-- **SEC-001** — Pipeline ZIP/update semánticamente incoherente (L: `unzip` en update; W: `install_ops.extractall` + cli seguro).
-- **SEC-002** — Concurrencia `input_state` sin lock (Linux; manifestación Windows N/E).
-- **SEC-003** — Lock de migración no atómico (canónica datos).
-- **REL-001** — Drift versión runtime / metadatos release.
+- **SEC-002** — Concurrencia `input_state` (L mitigado; W N/E backend distinto).
 
 ## Tablero PAR (resumen; detalle en bitácora)
 
@@ -65,4 +63,4 @@ windows_ref: 5dd784e+port (2026-05-22, capas v1.1)
 ## Sincronización
 
 - **Fase A (Linux):** `matrix_version: 2` + reclasificación por capas.
-- **Fase B (`hud_owerlay`):** [windows_parity_rollout.md](windows_parity_rollout.md) — columna Windows verificada 2026-05-22.
+- **Fase 2 (`hud_owerlay`):** columna Windows verificada 2026-05-26; `linux_ref` → `a19edb8`.

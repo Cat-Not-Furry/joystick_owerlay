@@ -124,6 +124,24 @@ def _default_profile(profile_id, name, button_count=6):
 def _default_window_mode():
 	return "normal"
 
+
+def _normalize_window_policy(window_mode):
+	"""Win32: ventana fija; perfiles Linux se normalizan al cargar."""
+	if os.name == "nt":
+		return "normal"
+	return _validate_choice(
+		window_mode,
+		["floating_hint", "normal"],
+		_default_window_mode(),
+	)
+
+
+def _normalize_ignore_videoresize(value):
+	"""Win32: siempre ignorar VIDEORESIZE (anti-parpadeo fijo)."""
+	if os.name == "nt":
+		return True
+	return bool(value)
+
 def _default_capture_mode():
 	return "normal"
 
@@ -569,11 +587,7 @@ def _normalize_profiles_data(data):
 		[p["id"] for p in profiles],
 		profiles[0]["id"],
 	)
-	window_mode = _validate_choice(
-		data.get("window_mode", _default_window_mode()),
-		["floating_hint", "normal"],
-		_default_window_mode(),
-	)
+	window_mode = _normalize_window_policy(data.get("window_mode", _default_window_mode()))
 	capture_mode = _validate_choice(
 		data.get("capture_mode", _default_capture_mode()),
 		SUPPORTED_CAPTURE_MODES,
@@ -584,7 +598,7 @@ def _normalize_profiles_data(data):
 		SUPPORTED_MONO_FONT_FAMILIES,
 		_default_ui_font_family(),
 	)
-	ignore_videoresize = bool(data.get("ignore_videoresize", False))
+	ignore_videoresize = _normalize_ignore_videoresize(data.get("ignore_videoresize", False))
 	extensions = _normalize_extensions_config(data.get("extensions"))
 	return {
 		"active_profile": active_profile,
@@ -610,12 +624,12 @@ def load_profiles_data():
 	)
 	data = {
 		"active_profile": active_profile,
-		"window_mode": _validate_choice(
-			index_data.get("window_mode", _default_window_mode()),
-			["floating_hint", "normal"],
-			_default_window_mode(),
+		"window_mode": _normalize_window_policy(
+			index_data.get("window_mode", _default_window_mode())
 		),
-		"ignore_videoresize": bool(index_data.get("ignore_videoresize", False)),
+		"ignore_videoresize": _normalize_ignore_videoresize(
+			index_data.get("ignore_videoresize", False)
+		),
 		"capture_mode": _validate_choice(
 			index_data.get("capture_mode", _default_capture_mode()),
 			SUPPORTED_CAPTURE_MODES,

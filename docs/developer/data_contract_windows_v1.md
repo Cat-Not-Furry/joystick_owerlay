@@ -59,6 +59,18 @@ Cadena declarativa: [`configs/migrations/`](../../configs/migrations/), [`migrat
 - **Migración en instalación**: solo si el wizard **detecta** datos en rutas `hud_owerlay` y el usuario confirma.
 - Sin rescate automático desde `hud_overlay` al arranque.
 
-## 6. JSON antiguo
+## 6. Política Win32 (ventana y WM)
+
+Capa **Adapted** frente a Linux (`motivo_plataforma: Win32`, `drift_permitido: Sí`).
+
+| Campo / comportamiento | Linux | Windows |
+|------------------------|-------|---------|
+| `window_mode` (`floating_hint` / `normal`) | Configurable en menú | **No expuesto en UI**; normalizar a `normal` al cargar |
+| `ignore_videoresize` | Toggle en menú | **No expuesto en UI**; política fija: ignorar redimensionado |
+| Ventana redimensionable (`pygame.RESIZABLE`) | Sí (WM tiling) | **No** — tamaño fijo para captura OBS estable |
+
+Los campos pueden persistir en `profiles_index.json` por compatibilidad de import desde Linux; el runtime Windows los sobrescribe al cargar. No validar `floating_hint` como opción activa en W.
+
+## 7. JSON antiguo
 
 - `json/profiles.json`: solo importación histórica; no es runtime v1.

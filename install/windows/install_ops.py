@@ -51,10 +51,21 @@ def validate_payload(root: Path) -> None:
 def extract_payload_archive(archive: Path, dest: Path) -> None:
 	dest.mkdir(parents=True, exist_ok=True)
 	if archive.suffix.lower() == ".zip":
-		import zipfile
+		import sys
 
-		with zipfile.ZipFile(archive, "r") as zf:
-			zf.extractall(dest)
+		engine_root = Path(__file__).resolve().parents[2] / "arcade" / "engine"
+		if str(engine_root) not in sys.path:
+			sys.path.insert(0, str(engine_root))
+		from utils.safe_zip_extract import extract_zip_safely
+
+		extract_zip_safely(
+			archive,
+			dest,
+			max_members=2048,
+			max_path_length=512,
+			max_uncompressed_file=64 * 1024 * 1024,
+			max_total_uncompressed=512 * 1024 * 1024,
+		)
 		return
 	raise RuntimeError("Solo ZIP soportado en esta versión; use payload.7z pre-extraído o .zip")
 
@@ -99,7 +110,7 @@ def write_manifest(
 	return path
 
 
-def register_uninstall_arp(install_root: Path, version: str = "1.0.0") -> None:
+def register_uninstall_arp(install_root: Path, version: str = "0.3.2") -> None:
 	uninst = install_root / UNINSTALL_EXE
 	key = rf"HKLM\Software\Microsoft\Windows\CurrentVersion\Uninstall\{APP_GUID}"
 	subprocess.run(

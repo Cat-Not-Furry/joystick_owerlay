@@ -1,0 +1,35 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      SDL_VIDEODRIVER: dummy
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Create tests/.tvenv
+        run: |
+          python -m venv tests/.tvenv
+          tests/.tvenv/bin/pip install --upgrade pip
+          tests/.tvenv/bin/pip install pygame keyboard
+          tests/.tvenv/bin/pip install -r tests/requirements-dev.txt
+
+      - name: Check version alignment
+        run: tests/.tvenv/bin/python scripts/check_version_alignment.py
+
+      - name: Check doc links
+        run: tests/.tvenv/bin/python scripts/check_doc_links.py
+
+      - name: Run pytest
+        run: tests/.tvenv/bin/python -m pytest tests/ -q

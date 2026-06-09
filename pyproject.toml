@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "joystick-overlay"
-version = "0.3.1"
+version = "0.3.2"
 description = "Joystick Owerlay: overlay arcade (Windows)"
 readme = "README.md"
 license = { file = "LICENSE" }

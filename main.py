@@ -149,7 +149,7 @@ CONFIRM_WINDOW_SIZE = (420, 230)
 APP_WINDOW_WIDTH = max(SCREEN_WIDTH, MENU_WIDTH, 460)
 APP_WINDOW_HEIGHT = max(SCREEN_HEIGHT, MENU_HEIGHT, 320)
 
-_current_window_mode = "floating_hint"
+_current_window_mode = "normal"
 
 
 def _now_str():
@@ -310,7 +310,7 @@ def _preflight_startup():
 
 def _set_window_size(width, height, title):
 	_debug_menu(f"_set_window_size({width}x{height})")
-	screen = pygame.display.set_mode((width, height), pygame.RESIZABLE)
+	screen = pygame.display.set_mode((width, height))
 	pygame.display.set_caption(title)
 	track_set_mode()
 	return screen
@@ -764,9 +764,6 @@ def _apply_main_menu_resize(screen, pending_resize, ignore_videoresize):
 	cur_w, cur_h = screen.get_size()
 	if abs(new_w - cur_w) <= VIDEORESIZE_TOLERANCE_PX and abs(new_h - cur_h) <= VIDEORESIZE_TOLERANCE_PX:
 		return screen
-	screen = pygame.display.set_mode((new_w, new_h), pygame.RESIZABLE)
-	track_set_mode()
-	_debug_count_set_mode()
 	return screen
 
 
@@ -774,10 +771,7 @@ def show_main_menu(screen, profile_data=None):
 	_debug_menu("show_main_menu INICIO")
 	options = ["Iniciar HUD", "Configurar perfiles", "Salir"]
 	selected = 0
-	ignore_videoresize = (
-		os.environ.get("HUD_IGNORE_VIDEORESIZE") == "1"
-		or (profile_data or {}).get("ignore_videoresize", False)
-	)
+	ignore_videoresize = True
 	clock = pygame.time.Clock()
 
 	while True:
@@ -845,7 +839,7 @@ def _run_hud_setup_interactive(profile, profile_data):
 			lambda s: run_joystick_diagnostic(
 				s,
 				button_count,
-				window_mode=profile_data.get("window_mode", "floating_hint"),
+				window_mode="normal",
 				controller_style=profile.get("controller_style", "default"),
 			),
 		)
@@ -988,11 +982,6 @@ def _apply_hud_resize(screen, pending_resize, ignore_videoresize):
 	new_w = max(MIN_WINDOW_WIDTH, pending_resize[0])
 	new_h = max(MIN_WINDOW_HEIGHT, pending_resize[1])
 	cur_w, cur_h = screen.get_size()
-	if abs(new_w - cur_w) <= VIDEORESIZE_TOLERANCE_PX and abs(new_h - cur_h) <= VIDEORESIZE_TOLERANCE_PX:
-		return screen
-	screen = pygame.display.set_mode((new_w, new_h), pygame.RESIZABLE)
-	track_set_mode()
-	_debug_count_set_mode()
 	return screen
 
 
@@ -1045,10 +1034,7 @@ def _run_hud_main_loop(
 	bg = get_background_color(profile_data.get("capture_mode", "normal"))
 	target_fps = TOURNAMENT_FPS if tournament_mode else FPS
 	training_state = create_training_state()
-	ignore_videoresize = (
-		os.environ.get("HUD_IGNORE_VIDEORESIZE") == "1"
-		or profile_data.get("ignore_videoresize", False)
-	)
+	ignore_videoresize = True
 	while running:
 		keys = pygame.key.get_pressed()
 		if input_mode in ("teclado", "hitbox", "mixbox"):
@@ -1167,22 +1153,14 @@ def run_hud_session(
 def _handle_boot_state(ctx):
 	global _current_window_mode
 	ctx.profile_data = load_profiles_data()
-	_current_window_mode = (
-		"normal"
-		if os.environ.get("HUD_WINDOW_MODE_NORMAL") == "1"
-		else ctx.profile_data.get("window_mode", "floating_hint")
-	)
+	_current_window_mode = "normal"
 	set_ui_font_family(ctx.profile_data.get("ui_font_family", "JetBrainsMono"))
 	return MainMenuState
 
 
 def _handle_main_menu_state(ctx):
 	global _current_window_mode
-	_current_window_mode = (
-		"normal"
-		if os.environ.get("HUD_WINDOW_MODE_NORMAL") == "1"
-		else ctx.profile_data.get("window_mode", "floating_hint")
-	)
+	_current_window_mode = "normal"
 	set_ui_font_family(ctx.profile_data.get("ui_font_family", "JetBrainsMono"))
 	action = show_main_menu(ctx.screen, ctx.profile_data)
 	_debug_menu(f"state MainMenu action={action}")
@@ -1245,7 +1223,7 @@ def main():
 		sys.exit(1)
 	pygame.init()
 	os.environ["SDL_VIDEO_WINDOW_POS"] = "100,100"
-	_current_window_mode = "floating_hint"
+	_current_window_mode = "normal"
 	screen = _set_window_size(APP_WINDOW_WIDTH, APP_WINDOW_HEIGHT, "Arcade HUD Overlay")
 
 	ctx = ApplicationContext(screen)

@@ -255,24 +255,57 @@ def _load_migration_index():
 		return None
 
 
+_migration_lock_fh = None
+
+
 def _acquire_migration_lock(migration_id):
+	global _migration_lock_fh
 	lock_path = os.path.join(USER_DIR, ".migration_lock")
 	os.makedirs(USER_DIR, exist_ok=True)
 	try:
-		if os.path.isfile(lock_path):
-			return False
-		with open(lock_path, "w", encoding="utf-8") as fh:
-			json.dump({"pid": os.getpid(), "migration_id": migration_id}, fh)
+		lock_fh = open(lock_path, "a+", encoding="utf-8")
+		if os.name == "nt":
+			import msvcrt
+
+			lock_fh.seek(0)
+			try:
+				msvcrt.locking(lock_fh.fileno(), msvcrt.LK_NBLCK, 1)
+			except OSError:
+				lock_fh.close()
+				return False
+		else:
+			import fcntl
+
+			try:
+				fcntl.flock(lock_fh.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+			except BlockingIOError:
+				lock_fh.close()
+				return False
+		lock_fh.seek(0)
+		lock_fh.truncate()
+		json.dump({"pid": os.getpid(), "migration_id": migration_id}, lock_fh)
+		lock_fh.flush()
+		_migration_lock_fh = lock_fh
 		return True
 	except Exception:
 		return False
 
 
 def _release_migration_lock():
+	global _migration_lock_fh
 	try:
-		lp = os.path.join(USER_DIR, ".migration_lock")
-		if os.path.isfile(lp):
-			os.remove(lp)
+		if _migration_lock_fh is not None:
+			if os.name == "nt":
+				import msvcrt
+
+				_migration_lock_fh.seek(0)
+				msvcrt.locking(_migration_lock_fh.fileno(), msvcrt.LK_UNLCK, 1)
+			else:
+				import fcntl
+
+				fcntl.flock(_migration_lock_fh.fileno(), fcntl.LOCK_UN)
+			_migration_lock_fh.close()
+			_migration_lock_fh = None
 	except Exception:
 		pass
 

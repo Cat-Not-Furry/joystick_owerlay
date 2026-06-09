@@ -1,13 +1,14 @@
 import unittest
 
 from application_context import ApplicationContext
-from state_manager import (
+from core.state_manager import (
 	BootState,
 	MainMenuState,
 	ModalState,
 	ProfileConfigState,
 	HudSetupState,
 	HudRunState,
+	HudLayoutEditorState,
 	STOP,
 	StateManager,
 )
@@ -15,8 +16,6 @@ from state_manager import (
 
 class TestStateRegistry(unittest.TestCase):
 	def test_all_planned_states_exist(self):
-		from state_manager import HudLayoutEditorState
-
 		self.assertTrue(issubclass(BootState, object))
 		self.assertTrue(issubclass(MainMenuState, object))
 		self.assertTrue(issubclass(ModalState, object))

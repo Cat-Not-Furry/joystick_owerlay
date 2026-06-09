@@ -21,8 +21,20 @@ parity_layers: 2026-05-18
 ## Alcance de auditoría (metodología)
 
 - Lectura estática / inventario por defecto.
-- **Exclusión habitual** salvo autorización explícita: `venv/`, ejecución de `scripts/`, `tests/`.
+- **Exclusión habitual** salvo autorización explícita: `venv/` de usuario, ejecución de `scripts/`, `tests/`.
+- Con autorización B–D, el agente usa los entornos documentados en [agent_runtime_v1.md](agent_runtime_v1.md) (`.venv/`, `tests/.tvenv/`); no sustituyen `venv/` de `install.sh`.
 - Hallazgos en registry con `evidence: Estática` cuando no hubo runtime.
+
+### Ejecución autorizada (niveles B–E)
+
+| Nivel | Uso | Entorno |
+|-------|-----|---------|
+| B | pytest selectivo | `tests/.tvenv` |
+| C | scripts métricas / `check_doc_links` | `tests/.tvenv` |
+| D | smoke runtime (FPS, menú, `cli.py doctor`) | `.venv` o `tests/.tvenv` |
+| E | `install.sh` / instalación real | `venv/` |
+
+En informes con ejecución, incluir `execution_level`, `venv_used`, comando y `exit_code` (ver [agent_runtime_v1.md](agent_runtime_v1.md)).
 
 ## Familias de ID
 
@@ -181,6 +193,7 @@ La bitácora conserva Parte A/B; puede enlazar este anexo sin reescribir el inve
 
 ## Referencias
 
+- [Runtime del agente v1](agent_runtime_v1.md) — entornos `.venv` / `tests/.tvenv` y niveles B–E
 - [Modelo de seguridad](../security/security_model.md) — políticas ZIP/FS (no redefinir aquí)
 - [Contrato de datos v1](data_contract_v1.md)
 - [Bitácora](../archive/bitacora.md) · [Registry](../archive/findings_registry.md) · [Parity matrix](../archive/parity_matrix.md)

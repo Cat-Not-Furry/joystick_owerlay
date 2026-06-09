@@ -5,7 +5,7 @@ import pygame
 
 from config import BACKUP_PROFILES_ROOT
 from profiles import save_profiles_data
-from render.profile_config_menu import _run_message_modal
+from render.profile_config.modals import _run_message_modal
 from utils import draw_centered_text, build_responsive_font, run_modal_child_window
 
 

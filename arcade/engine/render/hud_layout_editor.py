@@ -28,6 +28,7 @@ from profiles.hud_layout import (
 _DIR_EDIT_ORDER = ("LEFT", "UP", "DOWN", "RIGHT")
 from utils import draw_centered_text, build_responsive_font
 from core.assets_resolver import resolve_icons_map_from_profile_dict
+from render.hud_layout_editor_hit import pick_drag_target
 from render.hud_renderer import (
 	draw_hud,
 	load_icons,
@@ -467,39 +468,25 @@ def run_hud_layout_editor(screen, active_profile, window_mode="floating_hint"):
 							dir_xy[dk] = _clamp_base(dir_xy[dk])
 			elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
 				mx, my = event.pos
-				if (mx - dsx) ** 2 + (my - dsy) ** 2 <= r * r:
-					dragging = "dirs"
-					active_handle = 0
-				else:
-					hit_dir = False
-					if dir_xy is not None:
-						for i, dk in enumerate(_DIR_EDIT_ORDER):
-							dcx, dcy = _dir_screen(dk, scale)
-							if (mx - dcx) ** 2 + (my - dcy) ** 2 <= r * r:
-								dragging = dk
-								active_handle = 1 + i
-								hit_dir = True
-								break
-					if not hit_dir:
-						hit_btn = False
-						for i, lb in enumerate(labels):
-							bx, by = btn_screen[lb]
-							if (mx - bx) ** 2 + (my - by) ** 2 <= r * r:
-								dragging = lb
-								active_handle = idx_first_btn + i
-								hit_btn = True
-								break
-						if not hit_btn:
-							for sl, (sx, sy) in (
-								("SELECT", _sys_screen("SELECT", scale)),
-								("START", _sys_screen("START", scale)),
-							):
-								if (mx - sx) ** 2 + (my - sy) ** 2 <= r * r:
-									dragging = sl
-									active_handle = (
-										idx_sys_select if sl == "SELECT" else idx_sys_start
-									)
-									break
+				drag_key, handle_idx = pick_drag_target(
+					mx,
+					my,
+					dsx,
+					dsy,
+					btn_screen,
+					labels,
+					dir_xy,
+					scale,
+					r,
+					idx_first_btn,
+					idx_sys_select,
+					idx_sys_start,
+					_dir_screen,
+					_sys_screen,
+				)
+				if drag_key is not None:
+					dragging = drag_key
+					active_handle = handle_idx
 			elif event.type == pygame.MOUSEBUTTONUP and event.button == 1:
 				dragging = None
 			elif event.type == pygame.MOUSEMOTION and dragging:

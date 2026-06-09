@@ -170,7 +170,7 @@ def open_secondary_window(title, size=(460, 260), window_mode="floating_hint"):
 	_debug_menu(f"open_secondary_window {title} {size}")
 	previous_surface = pygame.display.get_surface()
 	previous_size = previous_surface.get_size() if previous_surface else (SCREEN_WIDTH, SCREEN_HEIGHT)
-	window = pygame.display.set_mode(size, pygame.RESIZABLE)
+	window = pygame.display.set_mode(size)
 	pygame.display.set_caption(title)
 	track_set_mode()
 	return window, previous_size
@@ -180,7 +180,7 @@ def restore_primary_window(size, window_mode="floating_hint", title=None):
 	_debug_menu(f"restore_primary_window {size}")
 	if title is None:
 		title = WINDOW_CAPTION_APP
-	window = pygame.display.set_mode(size, pygame.RESIZABLE)
+	window = pygame.display.set_mode(size)
 	pygame.display.set_caption(title)
 	track_set_mode()
 	return window
