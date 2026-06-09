@@ -201,7 +201,29 @@ def run_modal_child_window(
 	return runner(screen)
 
 
+def _enumerate_pygame_joystick_stubs():
+	pygame.joystick.init()
+	stubs = []
+	for idx in range(pygame.joystick.get_count()):
+		try:
+			joy = pygame.joystick.Joystick(idx)
+			joy.init()
+			stubs.append(_PygameJoystickStub(idx, joy.get_name()))
+		except Exception:
+			continue
+	return stubs
+
+
 def get_first_joystick_device(name_filters):
+	if os.name == "nt":
+		normalized_filters = [name.lower() for name in name_filters]
+		stubs = _enumerate_pygame_joystick_stubs()
+		for stub in stubs:
+			device_name = stub.name.lower()
+			if any(name in device_name for name in normalized_filters):
+				return stub
+		return stubs[0] if stubs else None
+
 	normalized_filters = [name.lower() for name in name_filters]
 
 	for path in evdev.list_devices():
@@ -229,6 +251,9 @@ def _supports_gamepad_capabilities(device):
 		return False
 
 def list_gamepad_devices_by_capabilities():
+	if os.name == "nt":
+		return _enumerate_pygame_joystick_stubs()
+
 	results = []
 	for path in evdev.list_devices():
 		try:
@@ -244,6 +269,12 @@ def list_gamepad_devices_by_capabilities():
 def find_gamepad_by_name(name_query):
 	query = name_query.strip().lower()
 	if query == "":
+		return None
+
+	if os.name == "nt":
+		for stub in _enumerate_pygame_joystick_stubs():
+			if query in stub.name.lower():
+				return stub
 		return None
 
 	for device in list_gamepad_devices_by_capabilities():

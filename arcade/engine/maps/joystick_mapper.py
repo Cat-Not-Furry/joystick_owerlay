@@ -5,8 +5,11 @@
 import os
 import pygame
 import json
-import select
-from evdev import InputDevice, ecodes
+
+if os.name != "nt":
+	import select
+	from evdev import InputDevice, ecodes
+
 from config import (
 	get_button_labels,
 	JOYSTICK_BINDINGS_PATH,
@@ -131,39 +134,77 @@ def _prompt_manual_device_name(screen, window_mode="floating_hint"):
 		screen=screen,
 	)
 
-def _wait_for_single_button(dev, screen, label, controller_style, button_count):
-	"""Espera a que el usuario presione un boton. Retorna event.code o None si cancela."""
+def _draw_button_prompt(screen, label, controller_style, button_count):
 	display_name = get_hud_fallback_text(label, controller_style, button_count)
 	prompt = f"Presiona boton {display_name} ({label})"
-	while True:
-		lines = [prompt, "Esc para cancelar"]
-		font, line_gap = build_responsive_font(
-			screen,
-			lines,
-			base_size=32,
-			min_size=14,
-			max_size=36,
-			base_resolution=(620, 360),
-		)
-		screen.fill((0, 0, 0))
-		title_y = max(32, line_gap)
-		draw_centered_text(screen, font, prompt, y=title_y)
-		draw_centered_text(screen, font, "Esc para cancelar", y=title_y + line_gap)
-		pygame.display.flip()
+	lines = [prompt, "Esc para cancelar"]
+	font, line_gap = build_responsive_font(
+		screen,
+		lines,
+		base_size=32,
+		min_size=14,
+		max_size=36,
+		base_resolution=(620, 360),
+	)
+	screen.fill((0, 0, 0))
+	title_y = max(32, line_gap)
+	draw_centered_text(screen, font, prompt, y=title_y)
+	draw_centered_text(screen, font, "Esc para cancelar", y=title_y + line_gap)
+	pygame.display.flip()
 
+
+def _wait_for_single_button_pygame(joystick, screen, label, controller_style, button_count):
+	"""Win32: espera pulsación de botón vía pygame (índice de botón)."""
+	prev = [bool(joystick.get_button(i)) for i in range(joystick.get_numbuttons())]
+	while True:
+		_draw_button_prompt(screen, label, controller_style, button_count)
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
 				pygame.quit()
 				exit()
 			if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
 				return None
+		pygame.event.pump()
+		for btn in range(joystick.get_numbuttons()):
+			pressed = bool(joystick.get_button(btn))
+			if pressed and not prev[btn]:
+				return btn
+			prev[btn] = pressed
+	return None
 
+
+def _wait_for_single_button_evdev(dev, screen, label, controller_style, button_count):
+	"""Linux: espera pulsación vía evdev (event.code)."""
+	while True:
+		_draw_button_prompt(screen, label, controller_style, button_count)
+		for event in pygame.event.get():
+			if event.type == pygame.QUIT:
+				pygame.quit()
+				exit()
+			if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+				return None
 		r, _, _ = select.select([dev], [], [], 0.01)
 		if dev in r:
 			for event in dev.read():
 				if event.type == ecodes.EV_KEY and event.value == 1:
 					return event.code
 	return None
+
+
+def _joystick_index_from_path(device_path):
+	if device_path is None:
+		return None
+	path = str(device_path)
+	if path.startswith("pygame:"):
+		try:
+			return int(path.split(":", 1)[1])
+		except ValueError:
+			return None
+	try:
+		idx = int(path)
+		return idx if idx >= 0 else None
+	except (TypeError, ValueError):
+		return None
 
 
 def _save_joystick_bindings_legacy(formato, bindings):
@@ -200,14 +241,63 @@ def _save_joystick_bindings_profile(profile_id, formato, bindings):
 	_save_joystick_bindings_legacy(formato, bindings)
 
 
-def map_joystick_buttons(
+def _map_joystick_buttons_pygame(
 	screen,
 	button_count,
-	show_error=True,
-	device_path=None,
-	controller_style="default",
-	profile_id=None,
-	format_key=None,
+	show_error,
+	device_path,
+	controller_style,
+	profile_id,
+	format_key,
+):
+	labels = get_button_labels(button_count)
+	joystick_index = _joystick_index_from_path(device_path)
+	if joystick_index is None:
+		stub = get_first_joystick_device(DEVICE_NAME_FILTER)
+		if stub is not None:
+			joystick_index = stub.index
+
+	pygame.joystick.init()
+	if joystick_index is None or joystick_index >= pygame.joystick.get_count():
+		if show_error:
+			show_error_and_exit(screen, "Error\nNo se encontro ningun joystick.")
+		return None
+
+	joystick = pygame.joystick.Joystick(joystick_index)
+	joystick.init()
+	print(f"[INFO] Usando joystick: {joystick.get_name()}")
+	bindings = {}
+	for label in labels:
+		code = _wait_for_single_button_pygame(
+			joystick, screen, label, controller_style, button_count
+		)
+		if code is None:
+			return None
+		bindings[label] = code
+	for extra in ("SELECT", "START"):
+		code = _wait_for_single_button_pygame(
+			joystick, screen, extra, controller_style, button_count
+		)
+		if code is None:
+			return None
+		bindings[extra] = code
+
+	formato = format_key or get_bindings_format_key(button_count)
+	if profile_id:
+		_save_joystick_bindings_profile(profile_id, formato, bindings)
+	else:
+		_save_joystick_bindings_legacy(formato, bindings)
+	return bindings
+
+
+def _map_joystick_buttons_evdev(
+	screen,
+	button_count,
+	show_error,
+	device_path,
+	controller_style,
+	profile_id,
+	format_key,
 ):
 	labels = get_button_labels(button_count)
 
@@ -232,12 +322,16 @@ def map_joystick_buttons(
 	bindings = {}
 	try:
 		for label in labels:
-			code = _wait_for_single_button(dev, screen, label, controller_style, button_count)
+			code = _wait_for_single_button_evdev(
+				dev, screen, label, controller_style, button_count
+			)
 			if code is None:
 				return None
 			bindings[label] = code
 		for extra in ("SELECT", "START"):
-			code = _wait_for_single_button(dev, screen, extra, controller_style, button_count)
+			code = _wait_for_single_button_evdev(
+				dev, screen, extra, controller_style, button_count
+			)
 			if code is None:
 				return None
 			bindings[extra] = code
@@ -251,6 +345,36 @@ def map_joystick_buttons(
 	else:
 		_save_joystick_bindings_legacy(formato, bindings)
 	return bindings
+
+
+def map_joystick_buttons(
+	screen,
+	button_count,
+	show_error=True,
+	device_path=None,
+	controller_style="default",
+	profile_id=None,
+	format_key=None,
+):
+	if os.name == "nt":
+		return _map_joystick_buttons_pygame(
+			screen,
+			button_count,
+			show_error,
+			device_path,
+			controller_style,
+			profile_id,
+			format_key,
+		)
+	return _map_joystick_buttons_evdev(
+		screen,
+		button_count,
+		show_error,
+		device_path,
+		controller_style,
+		profile_id,
+		format_key,
+	)
 
 def _handle_diagnostic_option(option_index, screen, selected_path, button_count, controller_style):
 	"""Despacha la opcion seleccionada del menu de diagnostico. Retorna resultado o None si no aplica."""
